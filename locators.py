@@ -2,10 +2,9 @@ from selenium.webdriver.common.by import By
 
 
 class TrySqlPageLocators:
-    # REQUEST_FIELD = (By.CLASS_NAME, 'CodeMirror-lines')
     REQUEST_FIELD = (By.ID, 'textareaCodeSQL')
-    RESULT_FRAME = (By.ID, "iframeResultSQL")
     BUTTON_RUN = (By.CSS_SELECTOR, "button.ws-btn")
+    MESSAGE_FEEDBACK = (By.ID, "divResultSQL")
 
     RESULT_TABLE = (By.CSS_SELECTOR, "table.ws-table-all")
     TABLE_ROW = (By.CSS_SELECTOR, "table.ws-table-all tr")

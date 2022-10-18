@@ -1,24 +1,35 @@
+import pytest
 from pages.try_sql_page import TrySqlPage
 
 
-def test_request_select_all(browser):
-    link = "https://www.w3schools.com/sql/trysql.asp?filename=trysql_select_all"
-    page = TrySqlPage(browser, link)
-    page.open()
+class TestSqlPage:
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self, browser):
+        link = "https://www.w3schools.com/sql/trysql.asp?filename=trysql_select_all"
+        self.page = TrySqlPage(browser, link)
+        self.page.open()
+        yield
 
-    test_query = "SELECT * FROM Customers;"
-    page.send_query(test_query)
+    def test_request_select_all(self):
+        test_query = "SELECT * FROM Customers;"
+        self.page.send_query(test_query)
 
-    page.should_be_result_table()
-    page.checking_column_values_in_a_row({'CustomerName': 'Split Rail Beer & Ale', 'City': 'Lander'})
+        self.page.should_be_result_table()
+        self.page.checking_column_values_in_a_row({'CustomerName': 'Split Rail Beer & Ale', 'City': 'Lander'})
 
+    def test_request_with_query(self):
+        test_query = "SELECT * FROM Customers WHERE City='London';"
+        self.page.send_query(test_query)
 
-def test_request_with_query(browser):
-    link = "https://www.w3schools.com/sql/trysql.asp?filename=trysql_select_all"
-    page = TrySqlPage(browser, link)
-    page.open()
+        assert len(self.page.get_all_table_rows()) == 6, 'Number costumers where city = London should be 6'
 
-    test_query = "SELECT * FROM Customers WHERE City='London';"
-    page.send_query(test_query)
+    def test_create_a_new_entry(self):
+        test_query = "INSERT INTO Customers (CustomerName, ContactName, Address, City, PostalCode, Country" \
+                     ") VALUES ('Nikita', 'Varlok', 'Mangilik', 'Astana', '123456', 'Kazakhstan');"
+        self.page.send_query(test_query)
+        self.page.check_request_confirmation_message()
 
-    assert len(page.get_all_table_rows()) == 6, 'Number costumers where citi = London should be 6'
+        test_query = "SELECT * FROM Customers WHERE CustomerName='Nikita'"
+
+        self.page.send_query(test_query)
+        self.page.checking_column_values_in_a_row({'CustomerName': 'Nikita', 'ContactName': 'Varlok', 'City': 'Astana'})

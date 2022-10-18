@@ -1,6 +1,8 @@
-from pages.base_page import BasePage
+from pages.base_page import BasePage, logger
 from table_results import TableResults
 from locators import TrySqlPageLocators
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class TrySqlPage(BasePage, TableResults):
@@ -13,6 +15,16 @@ class TrySqlPage(BasePage, TableResults):
     def should_be_result_table(self) -> None:
         assert self.is_element_present(*TrySqlPageLocators.RESULT_TABLE), "Result table is not presented"
 
+    def check_request_confirmation_message(self):
+        WebDriverWait(self.browser, 5).until(
+            EC.text_to_be_present_in_element(
+                TrySqlPageLocators.MESSAGE_FEEDBACK, 'You have made changes to the database'))
+
+        # assert self.is_element_present(*TrySqlPageLocators.MESSAGE_FEEDBACK
+        #                                ), "Confirmation massage after doing request is not found"
+        message = self.browser.find_element(*TrySqlPageLocators.MESSAGE_FEEDBACK).text
+        logger.info(f'Confirmation massage after doing request - {message}')
+
     def send_query(self, query: str) -> None:
         self.should_be_request_field()
         self.should_be_button_run()
@@ -20,6 +32,7 @@ class TrySqlPage(BasePage, TableResults):
         self.browser.execute_script(f'window.editor.doc.setValue("{query}")')
         button_run = self.browser.find_element(*TrySqlPageLocators.BUTTON_RUN)
         button_run.click()
+
 
         # self.should_be_request_field()
         # self.browser.execute_script("document.body.innerHTML = arguments[0]",
