@@ -10,7 +10,7 @@ class TableResults:
         column_names = dict(zip(column_names, range(0, len(column_names))))
         return column_names
 
-    def get_all_table_rows(self) -> tuple[tuple[str, ...], ...]:
+    def get_all_table_rows(self) -> tuple:
         rows = self.browser.find_elements(*TrySqlPageLocators.TABLE_ROW)
         return tuple(tuple(column.text for column in row.find_elements(*TrySqlPageLocators.TABLE_COLUMN)
                            ) for row in rows[1:])
